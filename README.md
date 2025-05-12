@@ -52,7 +52,7 @@ The root `main.tf` file serves as the central configuration that:
 
 The connection between VPC and EKS is established by passing the VPC module outputs (like VPC ID and subnet IDs) to the EKS module inputs. This ensures that EKS is correctly deployed within the VPC.
 
-## CI/CD with Jenkins and GitHub Flow
+## CI/CD with Jenkins and Gitlab
 
 This project includes automation for Terraform using a Jenkins pipeline (`Jenkinsfile`) and follows the **GitHub Flow** strategy:
 
