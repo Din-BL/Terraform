@@ -1,0 +1,14 @@
+# Terraform state
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+
+# .terraform/ directory holds downloaded modules/providers
+.terraform/
+
+# Terraform plan files
+*.tfplan
+
+
