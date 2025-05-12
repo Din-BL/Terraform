@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/cfea7eff-9ff8-4fbf-beea-cb753e758cc7" alt="Image 1" width="400"/>
+  <img src="https://github.com/user-attachments/assets/dd8376a3-c96c-4ae4-b69b-3d56df81ccdc" alt="Image 2" width="400"/>
+</p>
+
 # AWS VPC with EKS - Terraform Modular Infrastructure
 
 This Terraform project creates AWS infrastructure with a modular approach, consisting of a centralized root configuration that manages VPC and EKS modules.
