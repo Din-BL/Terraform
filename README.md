@@ -6,11 +6,11 @@ This Terraform project creates AWS infrastructure with a modular approach, consi
 
 ```
 .
+├── Jenkinsfile             # Jenkins pipeline for Terraform automation
 ├── main.tf                 # Root configuration file
 ├── variables.tf            # Root variables
 ├── outputs.tf              # Root outputs
 ├── terraform.tfvars        # Variable values
-├── update-kubeconfig.sh    # Helper script
 ├── modules/
 │   ├── vpc/                # VPC module
 │   │   ├── main.tf
@@ -41,12 +41,6 @@ The infrastructure includes:
   - IAM roles and policies
   - Security groups
 
-## Prerequisites
-
-- [Terraform](https://www.terraform.io/downloads.html) >= 1.0.0
-- [AWS CLI](https://aws.amazon.com/cli/) configured with appropriate credentials
-- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) for Kubernetes management
-
 ## How It Works
 
 The root `main.tf` file serves as the central configuration that:
@@ -58,80 +52,28 @@ The root `main.tf` file serves as the central configuration that:
 
 The connection between VPC and EKS is established by passing the VPC module outputs (like VPC ID and subnet IDs) to the EKS module inputs. This ensures that EKS is correctly deployed within the VPC.
 
-## Usage
+## CI/CD with Jenkins and GitHub Flow
 
-1. Clone this repository
-2. Update the `terraform.tfvars` file with your settings
-3. Initialize the Terraform working directory:
+This project includes automation for Terraform using a Jenkins pipeline (`Jenkinsfile`) and follows the **GitHub Flow** strategy:
 
-```bash
-terraform init
-```
+1. **Feature Branch**:  
+   Developers create a new branch for each infrastructure change, e.g., `feature/s3`.
 
-4. Review the execution plan:
+2. **Push and Validate**:  
+   When code is pushed to a feature branch, the Jenkins pipeline is triggered automatically to run:
 
-```bash
-terraform plan
-```
+   - `terraform init`
+   - `terraform validate`
+   - `terraform plan`
 
-5. Apply the changes:
+   This ensures early feedback and prevents errors before applying changes.
 
-```bash
-terraform apply
-```
+3. **Pull Request & Review**:  
+   The developer opens a **Pull Request** (PR) to merge the feature branch into the main branch. The PR is reviewed by peers and must be approved before proceeding.
 
-6. Configure kubectl to connect to your EKS cluster:
+4. **Terraform Apply**:  
+   Only after the PR is merged into the main branch, Jenkins triggers a final step:
+   - `terraform apply`  
+     This ensures that infrastructure changes are only applied to the live environment after review and approval.
 
-```bash
-chmod +x update-kubeconfig.sh
-./update-kubeconfig.sh
-```
-
-7. Verify connectivity:
-
-```bash
-kubectl get nodes
-```
-
-8. To destroy the infrastructure:
-
-```bash
-terraform destroy
-```
-
-## Customization
-
-Modify the following variables in `terraform.tfvars` to customize your deployment:
-
-### VPC Configuration
-
-- `region` - AWS region for deployment
-- `environment` - Environment name (dev, staging, prod)
-- `vpc_cidr` - CIDR block for the VPC
-- `availability_zones` - List of AZs to use
-- `public_subnet_cidrs` - CIDR blocks for public subnets
-- `private_subnet_cidrs` - CIDR blocks for private subnets
-
-### EKS Configuration
-
-- `kubernetes_version` - Kubernetes version for the EKS cluster
-- `eks_node_instance_types` - EC2 instance types for worker nodes
-- `eks_node_desired_size` - Desired number of worker nodes
-- `eks_node_max_size` - Maximum number of worker nodes
-- `eks_node_min_size` - Minimum number of worker nodes
-
-## Best Practices Implemented
-
-- **Modular Design**: Infrastructure split into logical modules
-- **Single Source of Truth**: Root configuration manages all modules
-- **Explicit Dependencies**: Clear dependency chain from VPC to EKS
-- **High Availability**: Resources deployed across multiple AZs
-- **Security**: Private subnets for EKS nodes, VPC Flow Logs enabled
-- **Naming Convention**: Consistent naming with environment prefixes
-- **Documentation**: Comprehensive README and code comments
-- **Tags**: All resources tagged for better management
-
-## Notes
-
-- The NAT Gateway is deployed in only one AZ to reduce costs. For production workloads requiring higher availability, consider deploying a NAT Gateway in each AZ.
-- For production use, consider adding additional EKS add-ons such as cluster autoscaler, AWS Load Balancer Controller, etc.
+This approach provides a **safe, auditable, and collaborative** method for managing infrastructure as code.
